@@ -17,6 +17,14 @@ import (
 	"image/jpeg"
 )
 
+var (
+	ImgPath *string
+)
+
+func init() {
+	ImgPath = flag.String("path", "../image", "a string")
+}
+
 func getImageDimension(imagePath string) (int, int) {
 	file, err := os.Open(imagePath)
 	if err != nil {
@@ -115,7 +123,8 @@ func produceMSG(imgPath string) {
 }
 
 func main() {
-	imgPath := flag.String("path", "../image", "a string")
-	produceMSG(*imgPath)
+	flag.Parse()
+	logger.Println("input path is:", *ImgPath)
+	produceMSG(*ImgPath)
 	// fmt.Println(ListDir("./image", "jpg"))
 }
