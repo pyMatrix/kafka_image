@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/Shopify/sarama"
 	"io/ioutil"
@@ -78,7 +79,7 @@ func ListDir(dirPth string, suffix string) (files, fileName []string, err error)
 	return files, fileName, nil
 }
 
-func produceMSG() {
+func produceMSG(imgPath string) {
 	sarama.Logger = logger
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForAll
@@ -90,7 +91,7 @@ func produceMSG() {
 		os.Exit(500)
 	}
 	defer producer.Close()
-	files, fileName, err := ListDir("../image", "jpg")
+	files, fileName, err := ListDir(imgPath, "jpg")
 	if err != nil {
 		logger.Println("Failed to list dir:", err)
 		os.Exit(500)
@@ -114,6 +115,7 @@ func produceMSG() {
 }
 
 func main() {
-	produceMSG()
+	imgPath := flag.String("path", "../image", "a string")
+	produceMSG(*imgPath)
 	// fmt.Println(ListDir("./image", "jpg"))
 }
