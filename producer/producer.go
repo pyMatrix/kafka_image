@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 )
 
 import (
@@ -141,6 +142,8 @@ func produceMSG(imgPath string) {
 func main() {
 	flag.Parse()
 	logger.Println("input path is:", *ImgPath)
+	t1 := time.Now() // get current time
 	produceMSG(*ImgPath)
-	// fmt.Println(ListDir("./image", "jpg"))
+	elapsed := time.Since(t1)
+	logger.Println("time elapsed: ", elapsed)
 }
