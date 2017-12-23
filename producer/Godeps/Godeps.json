@@ -1,5 +1,5 @@
 {
-	"ImportPath": "kafka_benchtest",
+	"ImportPath": "kafka_benchtest/producer",
 	"GoVersion": "go1.9",
 	"GodepVersion": "v79",
 	"Deps": [
@@ -30,6 +30,10 @@
 		{
 			"ImportPath": "github.com/golang/snappy",
 			"Rev": "553a641470496b2327abcac10b36396bd98e45c9"
+		},
+		{
+			"ImportPath": "github.com/nfnt/resize",
+			"Rev": "891127d8d1b52734debe1b3c3d7e747502b6c366"
 		},
 		{
 			"ImportPath": "github.com/pierrec/lz4",
