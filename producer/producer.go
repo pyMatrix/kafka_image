@@ -101,7 +101,7 @@ func produceMSG() {
 			log.Fatal("getImgDataByFile error:", err)
 		}
 		msg := &sarama.ProducerMessage{}
-		msg.Topic = "k1testnew"
+		msg.Topic = "testy"
 		msg.Partition = int32(-1)
 		msg.Key = sarama.StringEncoder(fileName[i])
 		msg.Value = sarama.ByteEncoder(imgBytes)
