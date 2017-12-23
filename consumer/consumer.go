@@ -19,7 +19,7 @@ var (
 
 func main() {
 	sarama.Logger = logger
-	consumer, err := sarama.NewConsumer(strings.Split("gxm-k1:9092,gxm-k2:9092,gxm-k3:9092,", ","), nil)
+	consumer, err := sarama.NewConsumer(strings.Split("gxm-k1:9092,gxm-k2:9092,gxm-k3:9092,gxm-k4:9092,gxm-k5:9092", ","), nil)
 
 	if err != nil {
 		logger.Println("Failed to start consumer: %s", err)

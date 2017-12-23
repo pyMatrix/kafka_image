@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 )
 
 import (
@@ -19,6 +20,14 @@ import (
 
 var (
 	ImgPath *string
+	logger  = log.New(os.Stderr, "[srama]", log.LstdFlags)
+	// kafka broker list config
+	brokerList = "gxm-k1:9092,gxm-k2:9092,gxm-k3:9092,gxm-k4:9092,gxm-k5:9092"
+)
+
+const (
+	// 货柜数量，模拟并发数
+	SHELF_NUM = 6
 )
 
 func init() {
@@ -64,10 +73,6 @@ func GetImgDataByFile(imgPath string, rsz int) (imgByte []byte, err error) {
 	return buf.Bytes(), err
 }
 
-var (
-	logger = log.New(os.Stderr, "[srama]", log.LstdFlags)
-)
-
 func ListDir(dirPth string, suffix string) (files, fileName []string, err error) {
 	dir, err := ioutil.ReadDir(dirPth)
 	if err != nil {
@@ -93,7 +98,7 @@ func produceMSG(imgPath string) {
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Partitioner = sarama.NewRandomPartitioner
 	config.Producer.Return.Successes = true
-	producer, err := sarama.NewSyncProducer(strings.Split("gxm-k1:9092,gxm-k2:9092,gxm-k3:9092", ","), config)
+	producer, err := sarama.NewSyncProducer(strings.Split(brokerList, ","), config)
 	if err != nil {
 		logger.Println("Failed to produce message:", err)
 		os.Exit(500)
@@ -104,21 +109,32 @@ func produceMSG(imgPath string) {
 		logger.Println("Failed to list dir:", err)
 		os.Exit(500)
 	}
+	var wg sync.WaitGroup
+	ch := make(chan struct{}, SHELF_NUM)
 	for i := 0; i < len(files); i++ {
-		imgBytes, err := GetImgDataByFile(files[i], 6)
-		if err != nil {
-			log.Fatal("getImgDataByFile error:", err)
-		}
-		msg := &sarama.ProducerMessage{}
-		msg.Topic = "testy"
-		msg.Partition = int32(-1)
-		msg.Key = sarama.StringEncoder(fileName[i])
-		msg.Value = sarama.ByteEncoder(imgBytes)
-		partition, offset, err := producer.SendMessage(msg)
-		if err != nil {
-			logger.Println("Failed to produce message: ", err)
-		}
-		logger.Printf("partition=%d, offset=%d\n", partition, offset)
+		wg.Add(1)
+		ch <- struct{}{}
+		go func(index int) {
+			defer func() {
+				wg.Done()
+				<-ch
+			}()
+			imgBytes, err := GetImgDataByFile(files[i], 1)
+			if err != nil {
+				log.Fatal("getImgDataByFile error:", err)
+			}
+			msg := &sarama.ProducerMessage{}
+			msg.Topic = "testy"
+			msg.Partition = int32(-1)
+			msg.Key = sarama.StringEncoder(fileName[i])
+			msg.Value = sarama.ByteEncoder(imgBytes)
+			partition, offset, err := producer.SendMessage(msg)
+			if err != nil {
+				logger.Println("Failed to produce message: ", err)
+			}
+			logger.Printf("partition=%d, offset=%d\n, filename:%s", partition, offset, msg.Key)
+		}(i)
+		wg.Wait()
 	}
 }
 
