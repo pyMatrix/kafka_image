@@ -14,7 +14,7 @@ import (
 
 import (
 	"bytes"
-	"github.com/nfnt/resize"
+	_ "github.com/nfnt/resize"
 	"image"
 	"image/jpeg"
 )
@@ -60,14 +60,14 @@ func GetImgDataByFile(imgPath string, rsz int) (imgByte []byte, err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	width, _ := getImageDimension(imgPath)
-	new_width := uint(width / rsz)
-	// resize to width using Lanczos resampling
-	// and preserve aspect ratio
-	m := resize.Resize(new_width, 0, img, resize.Lanczos3)
+	// width, _ := getImageDimension(imgPath)
+	// new_width := uint(width / rsz)
+	// // resize to width using Lanczos resampling
+	// // and preserve aspect ratio
+	// m := resize.Resize(new_width, 0, img, resize.Lanczos3)
 	// convert image to []byte
 	buf := new(bytes.Buffer)
-	err = jpeg.Encode(buf, m, nil)
+	err = jpeg.Encode(buf, img, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
