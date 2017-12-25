@@ -24,13 +24,13 @@ func main() {
 	if err != nil {
 		logger.Println("Failed to start consumer: %s", err)
 	}
-	partitionList, err := consumer.Partitions("testy")
+	partitionList, err := consumer.Partitions("testbench")
 
 	if err != nil {
 		logger.Println("Failed to get the list of partitions: ", err)
 	}
 	for partition := range partitionList {
-		pc, err := consumer.ConsumePartition("testy", int32(partition), sarama.OffsetNewest)
+		pc, err := consumer.ConsumePartition("testbench", int32(partition), sarama.OffsetNewest)
 		if err != nil {
 			logger.Printf("Failed to start consumer for partition %d: %s\n", partition, err)
 		}
