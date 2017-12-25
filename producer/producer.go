@@ -28,7 +28,7 @@ var (
 
 const (
 	// 货柜数量，模拟并发数
-	SHELF_NUM = 6
+	SHELF_NUM = 4
 )
 
 func init() {
